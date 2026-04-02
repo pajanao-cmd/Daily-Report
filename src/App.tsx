@@ -40,6 +40,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useRef } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
+import { toPng } from 'html-to-image';
 import { 
   BarChart, 
   Bar, 
@@ -61,6 +62,7 @@ interface ProjectSection {
   color: string;
   iconName: string;
   descriptionTh: string;
+  progress?: number;
   content: {
     category: string;
     items: string[];
@@ -105,102 +107,163 @@ const getIcon = (name: string) => ICON_MAP[name] || <FileText className="w-6 h-6
 // --- Initial Data ---
 
 const INITIAL_DATA: ReportData = {
-  date: "1 เมษายน 2569",
-  dateEn: "1 Apr 2026",
-  summaryTh: "สรุปสถานะการดำเนินงานรายวันของโครงการ IT และสื่อสาร โดยเน้นที่การพัฒนา UI ของ CH7ON, การทดสอบระบบ Basketball Phase 2, และการแก้ไขปัญหาทางเทคนิคในระบบ AMS และ ESS เพื่อเตรียมความพร้อมสำหรับการ Deploy ระบบในลำดับถัดไป",
+  date: "9 มีนาคม 2569",
+  dateEn: "09 MARCH 2026",
+  summaryTh: "สรุปการประชุมรายสัปดาห์ NMD ครอบคลุมความคืบหน้าของแผนก Production ในการบริหารจัดการโควตาคอนเทนต์ และแผนก IT ในโครงการ Rebranding, ระบบ AMS, แชมป์กีฬาบาสเกตบอล 3x3 รวมถึงโครงการ Cloud ต่างๆ ที่กำลังดำเนินการ โดยภาพรวมโครงการส่วนใหญ่อยู่ในเกณฑ์ดีและเป็นไปตามแผนงาน",
   projects: [
     {
-      title: "CH7ON",
-      titleTh: "CH7ON: ปรับ UI และรอผลพิจารณาด้านกฎหมาย",
-      color: "bg-amber-400",
-      iconName: "PenTool",
-      descriptionTh: "อยู่ระหว่างปรึกษากฎหมายเรื่องโลโก้ และรอ Feedback สีเพื่อปรับปรุง UX/UI ต่อไป",
+      title: "Production & Content",
+      titleTh: "แผนกโปรดักชั่นและคอนเทนต์",
+      descriptionTh: "สรุปโควตาการสนับสนุนคอนเทนต์ 7HD ประจำปี และการจัดการคอนเทนต์นักศึกษาฝึกงาน",
+      color: "bg-indigo-600",
+      iconName: "Tv",
+      progress: 12,
       content: [
         {
-          category: "Design",
+          category: "7HD Content Quota (150 EP/Year)",
           items: [
-            "Logo: Consult กฎหมาย (Seven Network Australia)",
-            "UI: Home/ผังรายการ (Desktop) ส่งพิจารณา",
-            "UI: เมนูข่าว วาง layout รอ feedback",
-            "ปรับ UI ตามโทนสีใหม่ (กระทบ UX/UI)"
+            "เดือนมีนาคม: ใช้ไป 2 EP | 6 Short Clips",
+            "รวม ม.ค. - ก.พ.: 18 EP | 52 Short Clips",
+            "โควตาคงเหลือ: 132 EP | 48 Short Clips"
+          ]
+        },
+        {
+          category: "Internship Content",
+          items: [
+            "รายการ 'ก็ทายมาดิ' / 'เล่นกับหนูหน่อย'",
+            "สถานะ: รอส่งให้พี่เบิ้ลตรวจสอบก่อนลง BUGABOO"
+          ]
+        }
+      ]
+    },
+    {
+      title: "Ch7 Rebranding",
+      titleTh: "โครงการปรับโฉม Ch7",
+      descriptionTh: "การพัฒนาหน้าเว็บไซต์ใหม่แบ่งเป็น 2 ระยะ (MVP1 & MVP2) ตามแผนงานปี 2569",
+      color: "bg-sky-500",
+      iconName: "Zap",
+      progress: 35,
+      content: [
+        {
+          category: "Timeline & Milestones",
+          items: [
+            "MVP1: กำหนดการเดือนกรกฎาคม (JULY)",
+            "MVP2: กำหนดการเดือนกันยายน (SEPTEMBER)"
+          ]
+        },
+        {
+          category: "Current Progress",
+          items: [
+            "หารือหน้าผู้ประกาศข่าวเรียบร้อยแล้ว (9 มี.ค.)",
+            "ทีม Design: ออกแบบหน้า Home / ข่าว / ผู้ประกาศ เพิ่มเติม",
+            "ทีม Dev: วางแผนพัฒนาตาม Sprint งาน"
+          ]
+        }
+      ]
+    },
+    {
+      title: "IT Systems & Support",
+      titleTh: "ระบบไอทีและซัพพอร์ต",
+      descriptionTh: "การดูแลและพัฒนาระบบ AMS, MyCensor, BBMS และ SingleID",
+      color: "bg-emerald-500",
+      iconName: "ShieldCheck",
+      progress: 85,
+      content: [
+        {
+          category: "AMS & Chatbot",
+          items: [
+            "AMS Dashboard Chatbot: รอคิวนำเสนอกับคุณพัฒน์",
+            "AMS Support: Deploy เมื่อ 5 มี.ค. และดูแล User ต่อเนื่อง"
+          ]
+        },
+        {
+          category: "MyCensor & Others",
+          items: [
+            "MyCensor: ซ่อน Checkbox 'เฉพาะช่อง 7HD' ตาม Request",
+            "MyCensor: จัดทำสรุปยอดการชำระเงิน",
+            "SingleID / BBMS: Support User และ Update Log ตามปกติ"
           ]
         }
       ]
     },
     {
       title: "Basketball 3x3",
-      titleTh: "Basketball Phase 2: อยู่ในขั้นตอนการทดสอบ (QA)",
-      color: "bg-emerald-500",
+      titleTh: "แชมป์กีฬา: บาสเกตบอล 3x3",
+      descriptionTh: "ความคืบหน้าการพัฒนาระบบรับสมัครและหน้าประกาศผลการแข่งขัน",
+      color: "bg-orange-500",
       iconName: "Trophy",
-      descriptionTh: "ทดสอบระบบหน้าบ้าน (FE) และหลังบ้าน (BOF) ทั้งบนเว็บและแอปพลิเคชัน",
+      progress: 90,
       content: [
         {
-          category: "Phase 2",
+          category: "Phase 1: Regulation",
           items: [
-            "FE: ทดสอบ ทีม/คะแนน/โปรแกรม/รางวัล",
-            "FE: ดึงข้อมูล Bugaboo Shop",
-            "BOF: ทดสอบ Live Program (Live/Group/HOF)"
+            "หน้าระเบียบการ: ระบบพร้อม Go-Live"
+          ]
+        },
+        {
+          category: "Phase 1.2: Registration",
+          items: [
+            "Web: ระบบรับสมัครและชำระเงิน พร้อมส่งทดสอบ (10 มี.ค.)",
+            "BOF: เชื่อมต่อระบบชำระเงิน พร้อมส่งทดสอบ (10 มี.ค.)",
+            "App: ทดสอบปุ่มสมัครและหน้าประกาศผล (Web view)"
           ]
         }
       ]
     },
     {
-      title: "Game 9-11",
-      titleTh: "Game 9-11: เตรียมพร้อมและผลักดันเข้าสู่ระบบ",
-      color: "bg-emerald-400",
-      iconName: "Gamepad2",
-      descriptionTh: "เตรียมเกม 9-11 และทำการ Push เกม Bug-blast (Game 9) เรียบร้อยแล้ว",
-      content: [
-        {
-          category: "Development",
-          items: ["เตรียมเกม 9–11", "Push เกม 9 (bug-blast)"]
-        }
-      ]
-    },
-    {
-      title: "ESS",
-      titleTh: "เร่งแก้ไขปัญหา Login ของระบบ ESS",
+      title: "Live Events (PPV)",
+      titleTh: "ถ่ายทอดสดและกิจกรรมพิเศษ",
+      descriptionTh: "แผนการเตรียมความพร้อมสำหรับการถ่ายทอดสดกีฬาผ่านแพลตฟอร์ม",
       color: "bg-rose-500",
-      iconName: "Lock",
-      descriptionTh: "พบปัญหา Error 403 ขณะ Login โดยกำลังประสานงานเพื่อใช้ Keycloak Prod ในการแก้ไข",
+      iconName: "Activity",
+      progress: 60,
       content: [
         {
-          category: "Auth",
-          items: ["Error 403: แก้แล้วแต่ยัง login ไม่ได้", "ต้องใช้ Keycloak Prod"]
+          category: "Basketball 3x3 (Tero)",
+          items: [
+            "ถ่ายทอดสด: 13 - 15 มี.ค. 69",
+            "การเตรียมงาน: ปรับชิ้นงานโปรโมต ส่งงาน 10 มี.ค.",
+            "สถานะ: รอรับสัญญาณจากทางช่อง"
+          ]
+        },
+        {
+          category: "Badminton",
+          items: [
+            "ถ่ายทอดสด: 30 - 31 พ.ค. 69"
+          ]
         }
       ]
     },
     {
-      title: "AMS",
-      titleTh: "กำหนดการ Deploy และปรับปรุงระบบสำคัญ",
-      color: "bg-blue-500",
-      iconName: "Clock",
-      descriptionTh: "Deploy AMS V2 (2 เม.ย.) และแผนปรับปรุง SSL ในวันที่ 7-8 เม.ย. นี้",
+      title: "Cloud & Business",
+      titleTh: "โครงการคลาวด์และธุรกิจใหม่",
+      descriptionTh: "การขยายฐานลูกค้าและบริการด้าน Cloud Solutions และ AI Chatbot",
+      color: "bg-slate-700",
+      iconName: "Target",
+      progress: 45,
       content: [
         {
-          category: "Operations",
-          items: ["Deploy V2: 2 เม.ย.", "SSL Update: 7-8 เม.ย."]
-        }
-      ]
-    },
-    {
-      title: "TVOD",
-      titleTh: "BUGABOO TVOD ผ่านการทดสอบบน Staging",
-      color: "bg-amber-500",
-      iconName: "Tv",
-      descriptionTh: "ทดสอบระบบ Package UI และ Banner ผ่านแล้ว อยู่ระหว่างจัดการประเด็นชื่อ Package บนระบบจริง",
-      content: [
+          category: "Project Status",
+          items: [
+            "The Mall: E-Auction เรียบร้อยแล้ว รอประกาศผล",
+            "Metro_Magnecomp: เริ่มทำเนื้อหาสำหรับ Workshop",
+            "Honda: เริ่มทำ Proposal ส่งลูกค้าในสัปดาห์นี้"
+          ]
+        },
         {
-          category: "QA",
-          items: ["Test package UI / banner (ผ่าน)", "Log issue เปลี่ยนเงื่อนไขเป็นชื่อ package"]
+          category: "Revenue Outlook",
+          items: [
+            "แนวโน้มเก็บเงินปีนี้: ~3 ล้านบาท",
+            "งานใหม่ที่คาดว่าจะเข้า: ~5 ล้านบาท"
+          ]
         }
       ]
     }
   ],
   nextSteps: [
-    { project: "CH7ON", issue: "ข้อกฎหมายเรื่องโลโก้/สี", next: "รอ Feedback จากทีมกฎหมายเพื่อดำเนินการต่อ", color: "bg-amber-100" },
-    { project: "AMS / TVOD", issue: "พบ Issue หลายจุดและเงื่อนไขชื่อ Package", next: "เคลียร์ Issue ทั้งหมดก่อนการ Deploy", color: "bg-amber-50" },
-    { project: "ESS", issue: "ระบบยังติดปัญหา Login (403)", next: "ประสานทีม Dev เพื่อเชื่อมต่อ Keycloak Prod", color: "bg-rose-100" }
+    { project: "Basketball 3x3", issue: "Review ระบบ Phase 1.2", next: "นัดประชุมวันพุธนี้เพื่อตรวจสอบความพร้อมก่อน Go-Live", color: "bg-amber-100" },
+    { project: "Honda", issue: "AI Chatbot Proposal", next: "ส่ง Proposal ให้ลูกค้าภายในสัปดาห์นี้", color: "bg-sky-100" },
+    { project: "Production", issue: "Internship Content", next: "ส่งรายการให้พี่เบิ้ลตรวจสอบก่อนนำขึ้น BUGABOO", color: "bg-indigo-50" }
   ]
 };
 
@@ -265,7 +328,9 @@ export default function App() {
   const [inputText, setInputText] = useState("");
   const [showInput, setShowInput] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     setIsLoaded(true);
@@ -313,6 +378,7 @@ export default function App() {
             - descriptionTh: A detailed description of the project status in Thai.
             - color: Tailwind background color class (e.g., bg-indigo-600, bg-emerald-500, bg-amber-500, bg-rose-500, bg-sky-500).
             - iconName: One of: PenTool, Trophy, Gamepad2, Lock, Clock, Tv, Activity, Target, ShieldCheck, Zap, AlertCircle, CheckCircle2, Flag, FileText.
+            - progress: Estimated progress percentage (0-100) based on the input.
             - content: Array of categories (e.g., "Achievements", "Milestones", "Technical Updates") with a detailed list of items for each.
         - nextSteps: Array of next steps. Each step must have:
             - project: Project name
@@ -340,6 +406,7 @@ export default function App() {
                     descriptionTh: { type: Type.STRING },
                     color: { type: Type.STRING },
                     iconName: { type: Type.STRING },
+                    progress: { type: Type.NUMBER },
                     content: {
                       type: Type.ARRAY,
                       items: {
@@ -386,9 +453,43 @@ export default function App() {
     }
   };
 
+  const handleExportImage = async () => {
+    if (!reportRef.current) return;
+    
+    setIsExporting(true);
+    setStatusMessage("Preparing image export...");
+    
+    try {
+      // Small delay to ensure any hover states or animations are settled
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const dataUrl = await toPng(reportRef.current, {
+        cacheBust: true,
+        backgroundColor: '#f8fafc',
+        style: {
+          padding: '40px',
+          borderRadius: '0px'
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `Daily-Intelligence-${data.dateEn.replace(/\s/g, '-')}.png`;
+      link.href = dataUrl;
+      link.click();
+      
+      setStatusMessage("Export successful.");
+      setTimeout(() => setStatusMessage(null), 3000);
+    } catch (error) {
+      console.error("Export failed:", error);
+      setStatusMessage("Export failed. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 md:p-12 selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-2 md:p-6 selection:bg-indigo-100 selection:text-indigo-900">
+      <div className="max-w-5xl mx-auto">
         
         {/* Hidden File Input */}
         <input 
@@ -476,136 +577,145 @@ export default function App() {
 
         {/* Main Report Container */}
         <motion.div 
+          ref={reportRef}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="space-y-20 pb-32"
+          className="space-y-6 pb-12"
         >
           {/* Editorial Header Section */}
-          <header className="flex flex-col md:flex-row md:items-end justify-between gap-12 border-b-2 border-slate-900 pb-16">
-            <div className="space-y-8 max-w-3xl">
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
+          <header className="p-6 bg-white rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-4 max-w-3xl">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em]">
                   <Activity className="w-3 h-3" />
                   Status: Operational
                 </div>
-                <div className="px-4 py-1.5 border border-slate-200 rounded-full text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
+                <div className="px-3 py-1 border border-slate-200 rounded-full text-slate-400 text-[9px] font-black uppercase tracking-[0.3em]">
                   Ref: AIS-{data.dateEn.replace(/\s/g, '-')}
                 </div>
-                <div className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
+                <div className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.3em]">
                   Daily Operations Report
                 </div>
                 <button 
                   onClick={() => setShowInput(!showInput)}
-                  className="flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-colors"
+                  className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-colors"
                 >
                   <PenTool className="w-3 h-3" />
                   {showInput ? 'Close Console' : 'Input Data'}
                 </button>
+                <button 
+                  onClick={handleExportImage}
+                  disabled={isExporting}
+                  className="flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+                >
+                  {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                  {isExporting ? 'Exporting...' : 'Export Image'}
+                </button>
               </div>
               
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.8] uppercase">
+              <div className="space-y-2">
+                <h1 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tighter leading-[0.9] uppercase">
                   Daily <br />
                   <span className="text-indigo-600">Intelligence.</span>
                 </h1>
-                <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-2xl">
+                <p className="text-sm text-slate-500 font-medium leading-relaxed max-w-xl">
                   A comprehensive analysis of current operational metrics, project milestones, and strategic risk assessments for the CH7ON ecosystem.
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col items-end gap-6">
+            <div className="flex flex-col items-end gap-4">
               <div className="text-right">
-                <div className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] mb-2">Reference Date</div>
-                <div className="text-4xl font-black text-slate-900 tracking-tighter tabular-nums">{data.dateEn}</div>
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-1">Reference Date</div>
+                <div className="text-3xl font-bold text-slate-900 tracking-tighter tabular-nums">{data.dateEn}</div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System Integrity</div>
-                  <div className="text-xl font-black text-emerald-500">98.4%</div>
+                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">System Integrity</div>
+                  <div className="text-lg font-bold text-emerald-500">98.4</div>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-2xl">
-                  <ShieldCheck className="w-6 h-6" />
+                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-xl">
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
               </div>
             </div>
           </header>
 
           {/* Executive Summary Bento */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Main Narrative */}
-            <div className="lg:col-span-7 p-12 bg-white rounded-[4rem] border border-slate-100 shadow-2xl shadow-slate-200/40 flex flex-col justify-between group hover:border-indigo-200 transition-all duration-500">
-              <div className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform duration-500">
-                    <Zap className="w-6 h-6" />
+          <div className="p-6 bg-slate-50/50 rounded-[2.5rem] border border-slate-200/60">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              {/* Main Narrative */}
+              <div className="lg:col-span-7 p-6 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/30 flex flex-col justify-between group hover:border-indigo-200 transition-all duration-500">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform duration-500">
+                      <Zap className="w-4 h-4" />
+                    </div>
                   </div>
-                  <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em]">Section 01</div>
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">Executive Summary</h3>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                    {data.summaryTh}
+                  </p>
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Executive Summary</h3>
-                <p className="text-lg text-slate-600 font-medium leading-relaxed">
-                  {data.summaryTh}
-                </p>
+                <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-3">
+                      {[1,2,3,4].map(i => (
+                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-black text-slate-400 shadow-sm">
+                          U{i}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-emerald-500">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span className="text-[8px] font-black uppercase tracking-widest">Verified</span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-16 pt-8 border-t border-slate-50 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-4">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm">
-                        U{i}
+
+              {/* Quick Stats Column */}
+              <div className="lg:col-span-5 space-y-4">
+                {/* Highlights */}
+                <div className="p-6 bg-indigo-600 rounded-[2rem] text-white space-y-4 shadow-xl shadow-indigo-100 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-white/20 transition-colors" />
+                  <h3 className="text-[9px] font-black uppercase tracking-[0.4em] opacity-60 relative z-10">Key Highlights</h3>
+                  <ul className="space-y-3 relative z-10">
+                    {data.projects.slice(0, 3).map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 group/item">
+                        <div className="mt-1.5 w-1 h-1 rounded-full bg-indigo-300 group-hover/item:scale-150 transition-transform" />
+                        <span className="text-sm font-medium leading-tight">{item.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Risks */}
+                <div className="p-6 bg-rose-50 rounded-[2rem] border border-rose-100 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[9px] font-black uppercase tracking-[0.4em] text-rose-400">Risk Assessment</h3>
+                    <AlertCircle className="w-4 h-4 text-rose-500" />
+                  </div>
+                  <div className="space-y-4">
+                    {data.nextSteps.slice(0, 2).map((item, i) => (
+                      <div key={i} className="space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1 h-1 rounded-full bg-rose-500" />
+                          <span className="text-[8px] font-black text-rose-400 uppercase tracking-widest">Critical Path</span>
+                        </div>
+                        <p className="text-sm font-bold text-rose-900 leading-tight tracking-tight">{item.issue}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Reviewed by Operations Lead</div>
-                </div>
-                <div className="flex items-center gap-2 text-emerald-500">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Verified</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats Column */}
-            <div className="lg:col-span-5 space-y-8">
-              {/* Highlights */}
-              <div className="p-12 bg-indigo-600 rounded-[4rem] text-white space-y-8 shadow-2xl shadow-indigo-200 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-white/20 transition-colors" />
-                <h3 className="text-xs font-black uppercase tracking-[0.4em] opacity-60 relative z-10">Key Highlights</h3>
-                <ul className="space-y-6 relative z-10">
-                  {data.projects.slice(0, 3).map((item, i) => (
-                    <li key={i} className="flex items-start gap-5 group/item">
-                      <div className="mt-2 w-2 h-2 rounded-full bg-indigo-300 group-hover/item:scale-150 transition-transform" />
-                      <span className="text-lg font-bold leading-tight">{item.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Risks */}
-              <div className="p-12 bg-rose-50 rounded-[4rem] border border-rose-100 space-y-8">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase tracking-[0.4em] text-rose-400">Risk Assessment</h3>
-                  <AlertCircle className="w-6 h-6 text-rose-500" />
-                </div>
-                <div className="space-y-8">
-                  {data.nextSteps.slice(0, 2).map((item, i) => (
-                    <div key={i} className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                        <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest">Critical Path</span>
-                      </div>
-                      <p className="text-lg font-black text-rose-900 leading-none tracking-tight">{item.issue}</p>
+                  <div className="pt-3 border-t border-rose-100">
+                    <div className="flex items-center justify-between text-[8px] font-black text-rose-400 uppercase tracking-widest mb-1.5">
+                      <span>Mitigation Level</span>
+                      <span>Moderate</span>
                     </div>
-                  ))}
-                </div>
-                <div className="pt-6 border-t border-rose-100">
-                  <div className="flex items-center justify-between text-[10px] font-black text-rose-400 uppercase tracking-widest mb-3">
-                    <span>Mitigation Level</span>
-                    <span>Moderate</span>
-                  </div>
-                  <div className="w-full h-2 bg-rose-200 rounded-full overflow-hidden">
-                    <div className="w-2/3 h-full bg-rose-500" />
+                    <div className="w-full h-1 bg-rose-200 rounded-full overflow-hidden">
+                      <div className="w-2/3 h-full bg-rose-500" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -613,46 +723,50 @@ export default function App() {
           </div>
 
           {/* Project Deep-Dive Section */}
-          <div className="space-y-16">
-            <div className="flex items-end justify-between border-b-2 border-slate-900 pb-8">
-              <div className="space-y-4">
-                <div className="text-[12px] font-black text-slate-400 uppercase tracking-[0.5em]">Section 02</div>
-                <h3 className="text-4xl font-black text-slate-900 tracking-tighter uppercase">Project Deep-Dive</h3>
+          <div className="p-6 bg-white rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
+            <div className="flex items-end justify-between border-b border-slate-100 pb-3">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-slate-900 tracking-tighter uppercase">Project Deep-Dive</h3>
               </div>
-              <div className="flex gap-12">
+              <div className="flex gap-6">
                 <div className="text-right">
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Projects</div>
-                  <div className="text-2xl font-black">{data.projects.length.toString().padStart(2, '0')}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg. Velocity</div>
-                  <div className="text-2xl font-black text-indigo-600">68%</div>
+                  <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Active Projects</div>
+                  <div className="text-lg font-black">{data.projects.length.toString().padStart(2, '0')}</div>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.projects.map((project, idx) => (
-                <div key={idx} className="group flex flex-col md:flex-row gap-8 p-8 rounded-[3rem] hover:bg-white hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-700 border border-transparent hover:border-slate-100">
-                  <div className={`w-16 h-16 rounded-2xl ${project.color} flex items-center justify-center text-white shadow-xl shadow-current/20 shrink-0 group-hover:scale-105 transition-transform duration-700`}>
-                    {React.cloneElement(getIcon(project.iconName) as React.ReactElement, { className: 'w-8 h-8' })}
+                <div key={idx} className="group flex flex-col md:flex-row gap-4 p-4 rounded-[1.5rem] bg-slate-50/50 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-700 border border-transparent hover:border-slate-100">
+                  <div className={`w-10 h-10 rounded-lg ${project.color} flex items-center justify-center text-white shadow-lg shadow-current/20 shrink-0 group-hover:scale-105 transition-transform duration-700`}>
+                    {React.cloneElement(getIcon(project.iconName) as React.ReactElement, { className: 'w-5 h-5' })}
                   </div>
-                  <div className="space-y-6 py-1 flex-1">
-                    <div className="space-y-2">
+                  <div className="space-y-3 py-0.5 flex-1">
+                    <div className="space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{project.title}</div>
-                        <div className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Active</div>
+                        <div className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em]">{project.title}</div>
+                        <div className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Active</div>
                       </div>
-                      <h4 className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{project.titleTh}</h4>
+                      <h4 className="text-lg font-bold text-slate-900 tracking-tighter leading-tight">{project.titleTh}</h4>
                     </div>
-                    <p className="text-lg text-slate-500 font-medium leading-relaxed">
+                    <p className="text-sm text-slate-600 font-medium leading-relaxed">
                       {project.descriptionTh}
                     </p>
-                    <div className="pt-4 flex flex-wrap gap-3">
-                      {project.content[0].items.map((item, i) => (
-                        <span key={i} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-tighter group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-500">
-                          {item}
-                        </span>
+
+                    <div className="pt-1 space-y-1.5">
+                      {project.content.map((cat, cIdx) => (
+                        <div key={cIdx} className="space-y-1">
+                          <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{cat.category}</div>
+                          <ul className="space-y-1">
+                            {cat.items.map((item, i) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-slate-600 font-medium leading-relaxed">
+                                <div className={`mt-1.5 w-1 h-1 rounded-full shrink-0 ${project.color}`} />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -662,38 +776,36 @@ export default function App() {
           </div>
 
           {/* Strategic Next Steps */}
-          <div className="bg-slate-900 rounded-[5rem] p-16 md:p-24 text-white relative overflow-hidden shadow-3xl shadow-indigo-900/20">
-            <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/10 rounded-full blur-[150px] -mr-48 -mt-48" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px] -ml-48 -mb-48" />
+          <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden shadow-2xl shadow-indigo-900/20 border border-white/5">
+            <div className="absolute top-0 right-0 w-[20rem] h-[20rem] bg-indigo-500/10 rounded-full blur-[100px] -mr-24 -mt-24" />
             
-            <div className="relative z-10 space-y-20">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-white/10 pb-12">
-                <div className="space-y-6">
-                  <div className="text-[12px] font-black text-indigo-400 uppercase tracking-[0.5em]">Section 03</div>
-                  <h3 className="text-4xl font-black tracking-tighter uppercase">Strategic Next Steps</h3>
-                  <p className="text-lg text-slate-400 font-medium max-w-xl">Immediate actions required to maintain project velocity and mitigate identified risks.</p>
+            <div className="relative z-10 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold tracking-tighter uppercase">Strategic Next Steps</h3>
+                  <p className="text-sm text-slate-400 font-medium max-w-lg leading-relaxed">Immediate actions required to maintain project velocity and mitigate identified risks.</p>
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Total Actions</div>
-                    <div className="text-3xl font-black">{data.nextSteps.length.toString().padStart(2, '0')}</div>
+                    <div className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-0.5">Total Actions</div>
+                    <div className="text-xl font-black">{data.nextSteps.length.toString().padStart(2, '0')}</div>
                   </div>
-                  <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center">
-                    <ArrowRight className="w-10 h-10 text-indigo-400" />
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <ArrowRight className="w-5 h-5 text-indigo-400" />
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {data.nextSteps.map((step, idx) => (
-                  <div key={idx} className={`p-10 rounded-[3.5rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 group`}>
-                    <div className="space-y-8">
+                  <div key={idx} className={`p-6 rounded-[1.5rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 group`}>
+                    <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <div className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">{step.project}</div>
-                        <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                        <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em]">{step.project}</div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
                       </div>
-                      <h4 className="text-xl font-black tracking-tight group-hover:text-indigo-400 transition-colors leading-none">{step.issue}</h4>
-                      <p className="text-lg text-slate-400 font-medium leading-relaxed">{step.next}</p>
+                      <h4 className="text-lg font-bold tracking-tight group-hover:text-indigo-400 transition-colors leading-tight">{step.issue}</h4>
+                      <p className="text-sm text-slate-400 font-medium leading-relaxed">{step.next}</p>
                     </div>
                   </div>
                 ))}
@@ -702,25 +814,25 @@ export default function App() {
           </div>
 
           {/* Footer Section */}
-          <footer className="pt-20 border-t border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
-            <div className="flex items-center gap-8">
-              <div className="w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-xl">
-                <Flag className="w-8 h-8" />
+          <footer className="pt-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="flex items-center gap-6">
+              <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-xl">
+                <Flag className="w-6 h-6" />
               </div>
-              <div className="space-y-1">
-                <div className="text-xl font-black tracking-tighter uppercase">Operational Intelligence Unit</div>
-                <div className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em]">Internal Classification: Level 4</div>
+              <div className="space-y-0.5">
+                <div className="text-lg font-bold tracking-tighter uppercase">Operational Intelligence Unit</div>
+                <div className="text-[8px] text-slate-400 font-black uppercase tracking-[0.4em]">Internal Classification: Level 4</div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-12">
+            <div className="flex flex-wrap items-center gap-8">
               <div className="text-right">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Last Updated</div>
-                <div className="text-lg font-black tabular-nums">{data.date} 23:59</div>
+                <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Last Updated</div>
+                <div className="text-base font-black tabular-nums">{data.date} 23:59</div>
               </div>
-              <div className="w-px h-12 bg-slate-200 hidden md:block" />
+              <div className="w-px h-10 bg-slate-200 hidden md:block" />
               <div className="text-right">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Authorized By</div>
-                <div className="text-lg font-black">Executive Board</div>
+                <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Authorized By</div>
+                <div className="text-base font-black">Executive Board</div>
               </div>
             </div>
           </footer>
