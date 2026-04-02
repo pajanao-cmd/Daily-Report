@@ -26,6 +26,9 @@ import {
   Layers,
   Sparkles,
   ArrowRight,
+  PenTool,
+  Lock,
+  Tv,
   FileText,
   Download,
   Activity,
@@ -51,20 +54,24 @@ import {
 
 interface ProjectSection {
   title: string;
+  titleTh: string;
   color: string;
   icon: React.ReactNode;
+  descriptionTh: string;
   content: {
     category: string;
     items: string[];
-    subItems?: { label: string; value: string | string[] }[];
   }[];
 }
 
-type ViewMode = 'dashboard' | 'infographic' | 'poster';
+type ViewMode = 'dashboard' | 'infographic' | 'poster' | 'report';
 
 // --- Data ---
 
-const REPORT_DATE = "1 Apr 2026";
+const REPORT_DATE = "1 เมษายน 2569";
+const REPORT_DATE_EN = "1 Apr 2026";
+
+const SUMMARY_TH = "สรุปสถานะการดำเนินงานรายวันของโครงการ IT และสื่อสาร โดยเน้นที่การพัฒนา UI ของ CH7ON, การทดสอบระบบ Basketball Phase 2, และการแก้ไขปัญหาทางเทคนิคในระบบ AMS และ ESS เพื่อเตรียมความพร้อมสำหรับการ Deploy ระบบในลำดับถัดไป";
 
 const SUMMARY = {
   projects: [
@@ -102,8 +109,10 @@ const PIE_DATA = [
 const PROJECTS: ProjectSection[] = [
   {
     title: "CH7ON",
-    color: "bg-blue-500",
-    icon: <Layout className="w-5 h-5" />,
+    titleTh: "CH7ON: ปรับ UI และรอผลพิจารณาด้านกฎหมาย",
+    color: "bg-amber-400",
+    icon: <PenTool className="w-6 h-6" />,
+    descriptionTh: "อยู่ระหว่างปรึกษากฎหมายเรื่องโลโก้ และรอ Feedback สีเพื่อปรับปรุง UX/UI ต่อไป",
     content: [
       {
         category: "Design",
@@ -113,143 +122,84 @@ const PROJECTS: ProjectSection[] = [
           "UI: เมนูข่าว วาง layout รอ feedback",
           "ปรับ UI ตามโทนสีใหม่ (กระทบ UX/UI)"
         ]
-      },
-      {
-        category: "Development",
-        items: [
-          "Search: Transfer outsource, รองรับบาลี",
-          "พุทธศาสนสุภาษิต: Tablet/Mobile OK, Dark Mode รอสี",
-          "ผู้ประกาศข่าว: รอพัฒนาต่อ",
-          "Cookie: เตรียม implement",
-          "Migrate: Map news เพิ่ม, อาจไป BUGABOO"
-        ]
-      },
-      {
-        category: "QA & Meetings",
-        items: [
-          "Test Case: ผู้ประกาศข่าว / พุทธศาสนสุภาษิต (Done)",
-          "Test Case: News / Home / ผังรายการ (Done)",
-          "Weekly progress: สรุปส่งแล้ว",
-          "Reel/Short Video: นัด 2 เม.ย. 14:00"
-        ]
       }
     ]
   },
   {
     title: "Basketball 3x3",
-    color: "bg-orange-500",
-    icon: <Trophy className="w-5 h-5" />,
+    titleTh: "Basketball Phase 2: อยู่ในขั้นตอนการทดสอบ (QA)",
+    color: "bg-emerald-500",
+    icon: <Trophy className="w-6 h-6" />,
+    descriptionTh: "ทดสอบระบบหน้าบ้าน (FE) และหลังบ้าน (BOF) ทั้งบนเว็บและแอปพลิเคชัน",
     content: [
       {
-        category: "Phase 2 - Web",
+        category: "Phase 2",
         items: [
           "FE: ทดสอบ ทีม/คะแนน/โปรแกรม/รางวัล",
           "FE: ดึงข้อมูล Bugaboo Shop",
           "BOF: ทดสอบ Live Program (Live/Group/HOF)"
         ]
-      },
-      {
-        category: "Phase 2 - App",
-        items: [
-          "Done: ทีม/คะแนน/ข่าว/Header/คลิป",
-          "Doing: โปรแกรม/Live/ทำเนียบแชมป์"
-        ]
-      },
-      {
-        category: "Testing & Meetings",
-        items: [
-          "Web Dev: ส่ง issues แล้ว (Live/ข่าว/ทีม)",
-          "BOF Prod: ส่ง issues แล้ว (เพิ่ม/แก้ไขข้อมูล)",
-          "Meeting: Dev สอน QA ใช้ BOF"
-        ]
       }
     ]
   },
   {
-    title: "AMS (Asset Management)",
-    color: "bg-emerald-500",
-    icon: <Monitor className="w-5 h-5" />,
+    title: "Game 9-11",
+    titleTh: "Game 9-11: เตรียมพร้อมและผลักดันเข้าสู่ระบบ",
+    color: "bg-emerald-400",
+    icon: <Gamepad2 className="w-6 h-6" />,
+    descriptionTh: "เตรียมเกม 9-11 และทำการ Push เกม Bug-blast (Game 9) เรียบร้อยแล้ว",
     content: [
       {
-        category: "Monitor & Support",
-        items: [
-          "ตรวจ Importer / Rental / Email log",
-          "Issue: เที่ยงบันเทิงสด ข้อมูลผิดวัน",
-          "Issue: API Single ID report ไม่แสดงข้อมูล"
-        ]
-      },
-      {
-        category: "Test Issues",
-        items: [
-          "AR-718: เวลาออกอากาศบันทึกเป็นวินาที",
-          "AR-723: API report ไม่ขึ้นข้อมูล"
-        ]
-      },
-      {
-        category: "Operations",
-        items: [
-          "Deploy V2: 2 เม.ย. 21:30–22:30",
-          "SSL Update: 7 เม.ย. 21:00–22:00"
-        ]
-      }
-    ]
-  },
-  {
-    title: "BUGABOO TVOD",
-    color: "bg-rose-500",
-    icon: <Smartphone className="w-5 h-5" />,
-    content: [
-      {
-        category: "Staging (v1.127.4)",
-        items: ["Test package UI / banner (ผ่าน)"]
-      },
-      {
-        category: "Production (v1.127.0)",
-        items: ["Log issue เปลี่ยนเงื่อนไขเป็นชื่อ package"]
-      },
-      {
-        category: "BOF",
-        items: ["เพิ่ม preview clip ใน package"]
-      }
-    ]
-  },
-  {
-    title: "System & Others",
-    color: "bg-slate-600",
-    icon: <Settings className="w-5 h-5" />,
-    content: [
-      {
-        category: "MyCensor",
-        items: ["Deploy v2.8.0", "Standby Support", "สรุปยอดชำระเงิน"]
-      },
-      {
-        category: "SingleID / BBMS",
-        items: ["SSL Update: 8 เม.ย.", "Mailgun config: แจ้งผลแล้ว"]
-      },
-      {
-        category: "Game",
+        category: "Development",
         items: ["เตรียมเกม 9–11", "Push เกม 9 (bug-blast)"]
       }
     ]
   },
   {
-    title: "ESS (Employee Self Service)",
-    color: "bg-violet-500",
-    icon: <Users className="w-5 h-5" />,
+    title: "ESS",
+    titleTh: "เร่งแก้ไขปัญหา Login ของระบบ ESS",
+    color: "bg-rose-500",
+    icon: <Lock className="w-6 h-6" />,
+    descriptionTh: "พบปัญหา Error 403 ขณะ Login โดยกำลังประสานงานเพื่อใช้ Keycloak Prod ในการแก้ไข",
     content: [
       {
-        category: "Email Service",
-        items: ["เลิกใช้ Mailgun", "รอ Timeline"]
-      },
+        category: "Auth",
+        items: ["Error 403: แก้แล้วแต่ยัง login ไม่ได้", "ต้องใช้ Keycloak Prod"]
+      }
+    ]
+  },
+  {
+    title: "AMS",
+    titleTh: "กำหนดการ Deploy และปรับปรุงระบบสำคัญ",
+    color: "bg-blue-500",
+    icon: <Clock className="w-6 h-6" />,
+    descriptionTh: "Deploy AMS V2 (2 เม.ย.) และแผนปรับปรุง SSL ในวันที่ 7-8 เม.ย. นี้",
+    content: [
       {
-        category: "Authentication",
-        items: [
-          "Error 403: แก้แล้วแต่ยัง login ไม่ได้",
-          "ต้องใช้ Keycloak Prod (ประสานงาน)"
-        ]
+        category: "Operations",
+        items: ["Deploy V2: 2 เม.ย.", "SSL Update: 7-8 เม.ย."]
+      }
+    ]
+  },
+  {
+    title: "TVOD",
+    titleTh: "BUGABOO TVOD ผ่านการทดสอบบน Staging",
+    color: "bg-amber-500",
+    icon: <Tv className="w-6 h-6" />,
+    descriptionTh: "ทดสอบระบบ Package UI และ Banner ผ่านแล้ว อยู่ระหว่างจัดการประเด็นชื่อ Package บนระบบจริง",
+    content: [
+      {
+        category: "QA",
+        items: ["Test package UI / banner (ผ่าน)", "Log issue เปลี่ยนเงื่อนไขเป็นชื่อ package"]
       }
     ]
   }
+];
+
+const NEXT_STEPS = [
+  { project: "CH7ON", issue: "ข้อกฎหมายเรื่องโลโก้/สี", next: "รอ Feedback จากทีมกฎหมายเพื่อดำเนินการต่อ", color: "bg-amber-100" },
+  { project: "AMS / TVOD", issue: "พบ Issue หลายจุดและเงื่อนไขชื่อ Package", next: "เคลียร์ Issue ทั้งหมดก่อนการ Deploy", color: "bg-amber-50" },
+  { project: "ESS", issue: "ระบบยังติดปัญหา Login (403)", next: "ประสานทีม Dev เพื่อเชื่อมต่อ Keycloak Prod", color: "bg-rose-100" }
 ];
 
 // --- Components ---
@@ -290,10 +240,20 @@ const CategoryBlock: React.FC<{ category: string; items: string[] }> = ({ catego
 );
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
+  const [viewMode, setViewMode] = useState<ViewMode>('report');
+
+  const getBgColor = () => {
+    switch (viewMode) {
+      case 'dashboard': return 'bg-slate-50 text-slate-900';
+      case 'infographic': return 'bg-slate-900 text-white';
+      case 'poster': return 'bg-slate-900 text-white';
+      case 'report': return 'bg-[#f8fafc] text-slate-900';
+      default: return 'bg-slate-50 text-slate-900';
+    }
+  };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${viewMode === 'dashboard' ? 'bg-slate-50 text-slate-900' : 'bg-slate-900 text-white'} font-sans p-4 md:p-8`}>
+    <div className={`min-h-screen transition-colors duration-500 ${getBgColor()} font-sans p-4 md:p-8`}>
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}
@@ -310,8 +270,14 @@ export default function App() {
 
           <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 shadow-lg self-start md:self-auto overflow-hidden">
             <button 
+              onClick={() => setViewMode('report')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'report' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <FileText className="w-4 h-4" /> Report
+            </button>
+            <button 
               onClick={() => setViewMode('dashboard')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'dashboard' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'dashboard' ? 'bg-slate-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
             >
               <Layout className="w-4 h-4" /> Dashboard
             </button>
@@ -325,12 +291,188 @@ export default function App() {
               onClick={() => setViewMode('poster')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'poster' ? 'bg-emerald-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-300'}`}
             >
-              <FileText className="w-4 h-4" /> Poster
+              <BarChart3 className="w-4 h-4" /> Poster
             </button>
           </div>
         </header>
 
         <AnimatePresence mode="wait">
+          {viewMode === 'report' && (
+            <motion.div
+              key="report"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-8"
+            >
+              {/* Report Header */}
+              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
+                      <Activity className="w-3 h-3" />
+                      <span>Daily Status Report</span>
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                      รายงานสรุปสถานะโครงการและประเด็นสำคัญ
+                    </h2>
+                    <p className="text-slate-500 font-medium">ประจำวันที่ {REPORT_DATE}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right hidden md:block">
+                      <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Project Health</div>
+                      <div className="text-emerald-500 font-black text-xl">Stable</div>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex items-start gap-4">
+                    <div className="mt-1 p-2 bg-blue-500 rounded-lg text-white">
+                      <Info className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-slate-900">Executive Summary</h4>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {SUMMARY_TH}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Report Content */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Left Column: Projects */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="w-1 h-6 bg-blue-600 rounded-full" />
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Major Project Progress</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {PROJECTS.slice(0, 3).map((project, idx) => (
+                      <div key={idx} className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:border-blue-200 transition-colors group">
+                        <div className="flex items-start gap-5">
+                          <div className={`w-14 h-14 rounded-2xl ${project.color} flex items-center justify-center text-white shadow-lg shrink-0`}>
+                            {project.icon}
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+                              {project.titleTh}
+                            </h4>
+                            <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                              {project.descriptionTh}
+                            </p>
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              {project.content[0].items.map((item, i) => (
+                                <span key={i} className="px-3 py-1 rounded-full bg-slate-50 text-[10px] font-bold text-slate-500 border border-slate-100">
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Column: Systems & Risks */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="w-1 h-6 bg-rose-500 rounded-full" />
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">System Operations & Risks</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {PROJECTS.slice(3).map((project, idx) => (
+                      <div key={idx} className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:border-rose-200 transition-colors group">
+                        <div className="flex items-start gap-5">
+                          <div className={`w-14 h-14 rounded-2xl ${project.color} flex items-center justify-center text-white shadow-lg shrink-0`}>
+                            {project.icon}
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-black text-slate-900 group-hover:text-rose-600 transition-colors">
+                              {project.titleTh}
+                            </h4>
+                            <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                              {project.descriptionTh}
+                            </p>
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              {project.content[0].items.map((item, i) => (
+                                <span key={i} className="px-3 py-1 rounded-full bg-slate-50 text-[10px] font-bold text-slate-500 border border-slate-100">
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Next Steps Table */}
+              <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+                <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
+                    <ArrowRight className="w-6 h-6 text-blue-600" />
+                    Next Steps & Action Items
+                  </h3>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">3 Priority Items</div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50/50">
+                        <th className="px-8 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Project</th>
+                        <th className="px-8 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Current Issue</th>
+                        <th className="px-8 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Next Action</th>
+                        <th className="px-8 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {NEXT_STEPS.map((step, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
+                          <td className="px-8 py-6">
+                            <div className="font-black text-slate-900">{step.project}</div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className={`inline-block px-3 py-1 rounded-lg ${step.color} text-xs font-bold text-slate-700`}>
+                              {step.issue}
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="text-sm text-slate-600 font-medium">{step.next}</div>
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <div className="inline-flex items-center gap-2 text-amber-500 font-bold text-xs">
+                              <Clock className="w-3 h-3" />
+                              Pending
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Report Footer */}
+              <div className="flex justify-center pt-4 pb-12">
+                <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
+                  <Sparkles className="w-4 h-4" />
+                  Generated by AI Studio Intelligence
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {viewMode === 'dashboard' && (
             <motion.div 
               key="dashboard"
