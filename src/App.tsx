@@ -35,7 +35,8 @@ import {
   Target,
   Flag,
   Upload,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useRef } from 'react';
@@ -390,6 +391,7 @@ export default function App() {
         ${text}`,
         config: {
           responseMimeType: "application/json",
+          maxOutputTokens: 16384, // Increase limit for large reports
           responseSchema: {
             type: Type.OBJECT,
             properties: {
@@ -437,7 +439,15 @@ export default function App() {
         }
       });
 
-      const result = JSON.parse(response.text || "{}");
+      let result;
+      try {
+        const rawText = response.text || "{}";
+        result = JSON.parse(rawText);
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        throw new Error("The AI response was incomplete or malformed. Please try again with a shorter input or try regenerating.");
+      }
+
       if (result.projects && result.summaryTh) {
         setData(result);
         setStatusMessage(null);
@@ -466,9 +476,11 @@ export default function App() {
       const dataUrl = await toPng(reportRef.current, {
         cacheBust: true,
         backgroundColor: '#f8fafc',
+        pixelRatio: 2, // High resolution for A4 width
         style: {
           padding: '40px',
-          borderRadius: '0px'
+          borderRadius: '0px',
+          width: '210mm' // Force A4 width during export
         }
       });
       
@@ -489,7 +501,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-2 md:p-6 selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-[210mm] mx-auto">
         
         {/* Hidden File Input */}
         <input 
@@ -586,32 +598,51 @@ export default function App() {
           {/* Editorial Header Section */}
           <header className="p-6 bg-white rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-3xl">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em]">
-                  <Activity className="w-3 h-3" />
-                  Status: Operational
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em]">
+                    <Activity className="w-3 h-3" />
+                    Status: Operational
+                  </div>
+                  <div className="px-3 py-1 border border-slate-200 rounded-full text-slate-400 text-[9px] font-black uppercase tracking-[0.3em]">
+                    Ref: AIS-{data.dateEn.replace(/\s/g, '-')}
+                  </div>
+                  <div className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.3em]">
+                    Daily Operations Report
+                  </div>
                 </div>
-                <div className="px-3 py-1 border border-slate-200 rounded-full text-slate-400 text-[9px] font-black uppercase tracking-[0.3em]">
-                  Ref: AIS-{data.dateEn.replace(/\s/g, '-')}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button 
+                    onClick={() => setShowInput(!showInput)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-colors"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${showInput ? 'rotate-180' : ''} transition-transform duration-500`} />
+                    {showInput ? 'ปิดหน้าต่าง' : 'อัปเดตข้อมูลรายวัน'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (!inputText.trim()) {
+                        setShowInput(true);
+                        setStatusMessage("Please input data first.");
+                      } else {
+                        generateReport(inputText);
+                      }
+                    }}
+                    disabled={isGenerating}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1 bg-indigo-600 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
+                  >
+                    {isGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                    {isGenerating ? 'Generating...' : 'Generate AI'}
+                  </button>
+                  <button 
+                    onClick={handleExportImage}
+                    disabled={isExporting}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 disabled:opacity-50"
+                  >
+                    {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                    {isExporting ? 'Exporting...' : 'Export Image'}
+                  </button>
                 </div>
-                <div className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.3em]">
-                  Daily Operations Report
-                </div>
-                <button 
-                  onClick={() => setShowInput(!showInput)}
-                  className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-colors"
-                >
-                  <PenTool className="w-3 h-3" />
-                  {showInput ? 'Close Console' : 'Input Data'}
-                </button>
-                <button 
-                  onClick={handleExportImage}
-                  disabled={isExporting}
-                  className="flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
-                >
-                  {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                  {isExporting ? 'Exporting...' : 'Export Image'}
-                </button>
               </div>
               
               <div className="space-y-2">
