@@ -264,6 +264,7 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [inputText, setInputText] = useState("");
   const [showInput, setShowInput] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -284,10 +285,19 @@ export default function App() {
     reader.readAsText(file);
   };
 
-  const generateReport = async (inputText: string) => {
+  const generateReport = async (text: string) => {
+    if (!text.trim()) return;
     setIsGenerating(true);
+    setStatusMessage("Analyzing data...");
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      // Use process.env.GEMINI_API_KEY as per instructions
+      const apiKey = process.env.GEMINI_API_KEY || (process.env as any).API_KEY;
+      
+      if (!apiKey) {
+        throw new Error("API Key not found. Please ensure it is configured in the environment.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Analyze the following daily operational data and generate a comprehensive, detailed report in JSON format. 
@@ -311,7 +321,7 @@ export default function App() {
             - color: Tailwind background color class.
 
         Input Data:
-        ${inputText}`,
+        ${text}`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -363,9 +373,14 @@ export default function App() {
       const result = JSON.parse(response.text || "{}");
       if (result.projects && result.summaryTh) {
         setData(result);
+        setStatusMessage(null);
+        setShowInput(false); // Close console on success
+      } else {
+        throw new Error("Invalid response format from AI.");
       }
     } catch (error) {
       console.error("Error generating report:", error);
+      setStatusMessage(error instanceof Error ? error.message : "Failed to generate report. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -417,11 +432,27 @@ export default function App() {
                 />
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4 text-slate-400">
-                    <Info className="w-5 h-5" />
-                    <p className="text-xs font-bold uppercase tracking-widest leading-none">AI will analyze and format your input into the report structure below.</p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-4 text-slate-400">
+                      <Info className="w-5 h-5" />
+                      <p className="text-xs font-bold uppercase tracking-widest leading-none">AI will analyze and format your input into the report structure below.</p>
+                    </div>
+                    {statusMessage && (
+                      <p className={`text-xs font-bold uppercase tracking-widest ${statusMessage.includes('Failed') || statusMessage.includes('not found') ? 'text-rose-500' : 'text-indigo-500'}`}>
+                        {statusMessage}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-4 w-full md:w-auto">
+                    <button 
+                      onClick={() => {
+                        setInputText("");
+                        setStatusMessage(null);
+                      }}
+                      className="px-6 py-4 text-slate-400 hover:text-slate-600 text-[10px] font-black uppercase tracking-widest transition-all"
+                    >
+                      Clear
+                    </button>
                     <button 
                       onClick={() => fileInputRef.current?.click()}
                       className="flex-1 md:flex-none px-8 py-4 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-200 transition-all"
@@ -431,7 +462,7 @@ export default function App() {
                     <button 
                       onClick={() => generateReport(inputText)}
                       disabled={isGenerating || !inputText.trim()}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-3 px-12 py-4 bg-indigo-600 text-white rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
+                      className="flex-1 md:flex-none flex items-center justify-center gap-3 px-12 py-4 bg-indigo-600 text-white rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 disabled:opacity-50 disabled:shadow-none cursor-pointer disabled:cursor-not-allowed"
                     >
                       {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                       {isGenerating ? 'Processing...' : 'Generate Report'}
