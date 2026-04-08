@@ -1,1 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Sarabun:wght@400;700&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #E2E8F0;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #CBD5E1;
+  }
+
+  /* Export Specifics */
+  .export-mode .custom-scrollbar {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  
+  .export-mode .custom-scrollbar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .export-mode {
+    background: #F1F5F9 !important; /* Light slate background for the "frame" */
+    padding: 60px !important;
+    width: auto !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .export-container {
+    background-color: white !important;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.15) !important;
+    border-radius: 40px !important;
+    overflow: hidden !important;
+    width: 1587px !important;
+    position: relative !important;
+  }
+
+  /* Ensure Thai fonts look sharp */
+  .thai-text {
+    font-family: "Sarabun", sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+}
